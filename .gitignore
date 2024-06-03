@@ -43,3 +43,4 @@ dependencygraph.svg
 secrets
 token.json
 credentials.json
+*.csv

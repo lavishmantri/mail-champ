@@ -3,7 +3,7 @@ import fsPackage from 'fs';
 import { google } from 'googleapis';
 import path from 'path';
 import process from 'process';
-import { createCsvFile } from '../utils/csv';
+import { createCsvFile, readCsvFile } from '../utils/csv';
 
 const fs = fsPackage.promises;
 // If modifying these scopes, delete token.json.
@@ -90,6 +90,9 @@ async function listLabels(auth) {
 
 async function getMessageBody(auth, id) {
   const gmail = google.gmail({ version: 'v1', auth });
+
+
+
   const msg = await gmail.users.messages.get({
     format: 'full',
     // The ID of the message to retrieve. This ID is usually retrieved using `messages.list`. The ID is also contained in the result when a message is inserted (`messages.insert`) or imported (`messages.import`).
@@ -121,10 +124,30 @@ async function listMessages(auth) {
     return messages;
   }
 
-  createCsvFile(messages, '../hdfc.csv')
+  createCsvFile(messages, 'hdfc.csv')
   return messages;
 }
 
 export const getListOfMails = () => {
   authorize().then(listMessages).catch(console.error);
+};
+
+export const readBatchMessages = async () => {
+  authorize().then(async (auth) => {
+    const csvData = await readCsvFile('hdfc.csv');
+    const readPromises = csvData.map(thread => {
+      return getMessageBody(auth, thread.threadId).then((msg) => {
+        return { 
+          ...thread,
+          msg: msg.data.snippet
+         }
+      });
+    });
+
+    return Promise.all(readPromises).then(d => {
+      createCsvFile(d, 'file_msgs.csv')
+    });
+
+  });
+  
 };

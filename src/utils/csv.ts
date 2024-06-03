@@ -18,3 +18,28 @@ export function createCsvFile(data: Array<object>, filePath: string): void {
 
     console.log(`CSV file created successfully at ${filePath}`);
 }
+
+/**
+ * Function to read a CSV file and return its content as JSON
+ * @param {string} filePath - The path to the CSV file
+ * @returns {Promise<Array<Record<string, any>>>} - A promise that resolves to an array of objects representing the CSV content
+ */
+export function readCsvFile(filePath: string): Promise<Array<Record<string, any>>> {
+    return new Promise((resolve, reject) => {
+        const fileContent = fs.readFileSync(filePath, 'utf8');
+
+        Papa.parse<Record<string, any>>(fileContent, {
+            header: true,
+            complete: (result) => {
+                if (result.errors.length) {
+                    reject(result.errors);
+                } else {
+                    resolve(result.data);
+                }
+            },
+            error: (error) => {
+                reject(error);
+            }
+        });
+    });
+}

@@ -1,5 +1,5 @@
 import express from 'express';
-import { getListOfMails } from './clients/gmail';
+import { getListOfMails, readBatchMessages } from './clients/gmail';
 
 const app = express();
 const port = 4000;
@@ -15,6 +15,16 @@ app.get('/list', (req, res) => {
     data,
   });
 });
+
+app.get('/read-mesages', (req, res) => {
+  const data = readBatchMessages();
+
+  res.send('OK');
+})
+
+// app.get('assign-labels', (req, res) => {
+//   const data 
+// })
 
 app.listen(port, () => {
   return console.log(`Express is listening at http://localhost:${port}`);
