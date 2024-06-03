@@ -1,8 +1,9 @@
+import { authenticate } from '@google-cloud/local-auth';
 import fsPackage from 'fs';
+import { google } from 'googleapis';
 import path from 'path';
 import process from 'process';
-import { authenticate } from '@google-cloud/local-auth';
-import { google } from 'googleapis';
+import { createCsvFile } from '../utils/csv';
 
 const fs = fsPackage.promises;
 // If modifying these scopes, delete token.json.
@@ -120,6 +121,7 @@ async function listMessages(auth) {
     return messages;
   }
 
+  createCsvFile(messages, '../hdfc.csv')
   return messages;
 }
 
